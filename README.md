@@ -2,130 +2,231 @@
 
 # **Code Commenting and Documentation Standards**
 
-## 1. Purpose of This Document
+## **Table of Contents**
 
-This document outlines the approach used to properly **comment and document** a codebase that includes:
+1. [Purpose](#1-purpose)
+2. [Why It Matters](#2-why-it-matters)
+3. [Organizational and Business Impact](#3-organizational-and-business-impact)
+4. [General Commenting Guidelines](#4-general-commenting-guidelines)
+5. [Language-Specific Standards](#5-language-specific-standards)
 
-* **Python** (for backend and Modbus communication)
-* **HTML** (for frontend structure)
-* **JavaScript** (for interactivity and real-time communication using Socket.IO)
-
-The intent is to ensure that non-developer stakeholders understand the importance of documentation in maintaining a scalable, maintainable, and risk-mitigated software system.
-
----
-
-## 2. Why Commenting Matters
-
-Proper code comments and documentation:
-
-* Reduce onboarding time for new developers
-* Prevent knowledge silos and ensure team-wide understanding
-* Support long-term maintainability
-* Reduce operational risk when key personnel change
-* Facilitate faster development and troubleshooting
-
-Good comments explain the **why** behind the code—not just what the code is doing.
+   * [Python](#python)
+   * [JavaScript](#javascript)
+   * [HTML](#html)
+   * [Modbus](#modbus)
+   * [Socket.IO](#socketio)
+6. [Documentation Standards](#6-documentation-standards)
+7. [End-to-End Commenting Example](#7-end-to-end-commenting-example)
+8. [Summary](#8-summary)
+9. [Contact](#9-contact)
 
 ---
 
-## 3. Examples of Proper Commenting
+## **1. Purpose**
 
-### A. Python Example (Backend: Modbus Communication)
+This document defines a unified standard for **commenting** and **documenting** code used in real-time, sensor-driven, web-based systems that leverage:
+
+* **Python** (for backend logic and Modbus communications)
+* **JavaScript + Socket.IO** (for real-time interactivity)
+* **HTML/CSS** (for frontend rendering and user experience)
+
+Its purpose is to ensure:
+
+* Code is **clear and maintainable**
+* Knowledge is **shared and transferable**
+* Technical assets are **aligned with business goals**
+
+---
+
+## **2. Why It Matters**
+
+Well-documented and clearly commented code:
+
+* Speeds up developer onboarding
+* Reduces maintenance cost and time
+* Prevents misinterpretation of critical logic
+* Ensures product reliability during scale or handoff
+* Enables transparency for internal and external review
+
+---
+
+## **3. Organizational and Business Impact**
+
+Lack of documentation creates **knowledge silos**, where only a few engineers can understand or maintain parts of the codebase. This presents several critical business risks:
+
+* **Operational delays** when those individuals are unavailable
+* **Increased onboarding cost** for new team members
+* **Reduced team efficiency** and slower iteration cycles
+* **Negative signals during funding or acquisition due diligence**
+* **Potential loss of intellectual property clarity**
+
+### **During Funding and Due Diligence**
+
+Investors and acquirers often request access to the codebase for technical review. If the code is not properly documented:
+
+* It may be flagged as **a risk to long-term scalability**
+* It could **reduce company valuation**
+* It raises concerns around **team maturity and readiness**
+
+### **Protecting the Company and Shareholders**
+
+A well-commented and documented codebase:
+
+* Protects teams from over-reliance on individual contributors
+* Reduces business continuity risk
+* Safeguards shareholder value
+* Reflects engineering and operational maturity
+
+---
+
+## **4. General Commenting Guidelines**
+
+| Principle                          | Description                                                                   |
+| ---------------------------------- | ----------------------------------------------------------------------------- |
+| **Clarity over Cleverness**        | Write code and comments that are easy to understand                           |
+| **Explain “Why”, Not Just “What”** | The code shows what is being done; comments should explain why                |
+| **Keep Comments Updated**          | Outdated comments are misleading and should be removed or revised             |
+| **Avoid Redundancy**               | Don’t restate the obvious; add value through insights                         |
+| **Use Docstrings**                 | All public classes, methods, and functions must include structured docstrings |
+
+---
+
+## **5. Language-Specific Standards**
+
+### **Python**
+
+#### Single-line comment
 
 ```python
-from pymodbus.client.sync import ModbusTcpClient
+# Connect to Modbus device over TCP
+client = ModbusTcpClient('192.168.1.100', port=502)
+```
 
-# Create a Modbus TCP client to communicate with a field device
-client = ModbusTcpClient('192.168.1.10', port=502)
+#### Function docstring
 
-def read_sensor_data():
+```python
+def read_temperature():
     """
-    Reads temperature data from Modbus register 40001.
+    Reads temperature data from a Modbus device.
 
     Returns:
-        float: Temperature in degrees Celsius.
+        float: Temperature in Celsius.
+    Raises:
+        ConnectionError: If the Modbus read fails.
     """
-    response = client.read_holding_registers(0, 1)
-    if response.isError():
-        # If the device responds with an error, log it and return None
-        print("Error reading from Modbus device.")
-        return None
-    return response.registers[0] / 10.0  # Sensor data is scaled by 10
+```
+
+#### Block comment
+
+```python
+# Read and scale the raw value from register 40001
+# Original unit: tenths of degrees Celsius
 ```
 
 ---
 
-### B. JavaScript Example (Frontend: Real-time with Socket.IO)
+### **JavaScript**
+
+#### Single-line comment
 
 ```javascript
-const socket = io();  // Initialize Socket.IO client connection
+// Connect to the Socket.IO server
+const socket = io();
+```
 
-// Receive temperature updates from the server in real-time
+#### Inline comment
+
+```javascript
+// Update the temperature display in the UI
 socket.on('temperature_update', (data) => {
-    // Update the temperature value displayed in the UI
-    document.getElementById('temp-value').textContent = data.temp + " °C";
+    document.getElementById('temp-display').textContent = `${data.temp} °C`;
 });
 ```
 
 ---
 
-### C. HTML Example (Frontend UI Layout)
+### **HTML**
+
+#### Structural comment
 
 ```html
-<!-- Dashboard section displaying live temperature readings -->
+<!-- Section to display real-time temperature readings -->
 <div id="dashboard">
     <h2>Live Temperature</h2>
-    <p id="temp-value">Waiting for data...</p>
+    <p id="temp-display">Waiting for data...</p>
 </div>
 ```
 
 ---
 
-## 4. README File Outline
+### **Modbus**
 
-A clear and concise `README.md` file is critical for understanding the system's purpose, structure, and business value.
+* Always specify which register you're reading or writing
+* Include units and scaling
+* Use clear variable naming
 
-### Recommended Structure:
-
-```markdown
-# Project Name: Smart Monitoring System
-
-## Overview
-This system provides live monitoring of industrial sensor data using the Modbus protocol. Data is displayed in real-time via a web dashboard using Socket.IO for communication.
-
-## Architecture Summary
-- **Backend (Python)**:
-  - Connects to Modbus devices
-  - Sends live data over Socket.IO
-- **Frontend (JavaScript/HTML)**:
-  - Displays live updates from backend
-  - Lightweight and responsive UI
-
-## Business Value
-- Provides real-time visibility into critical operational metrics
-- Reduces downtime through early detection of anomalies
-- Increases transparency across technical and non-technical teams
-
-## Technology Stack
-- Python (Modbus communication)
-- JavaScript + Socket.IO (real-time updates)
-- HTML/CSS (user interface)
-
-## File Structure (Simplified)
+```python
+# Register 40001: Temperature sensor
+# Value in tenths of degrees Celsius
+temperature = client.read_holding_registers(0, 1).registers[0] / 10.0
 ```
 
-project-root/
-├── backend/
-│   └── modbus\_client.py
-├── frontend/
-│   ├── index.html
-│   └── app.js
-├── server.py  # Central server connecting backend and frontend
-└── README.md
+---
 
-````
+### **Socket.IO**
 
-## How to Run (Developer Use Only)
+* Comment emitted and received events
+* Indicate any data contract expected
+
+```javascript
+// Emit a request to refresh sensor data from backend
+socket.emit('request_sensor_data');
+
+// Listen for the update and handle it
+socket.on('temperature_update', (data) => {
+    updateTemperatureDisplay(data.temp);
+});
+```
+
+---
+
+## **6. Documentation Standards**
+
+### **README.md Must Include:**
+
+* **Project Overview**
+* **Architecture Summary**
+* **Business Value**
+* **Technology Stack**
+* **Installation and Setup Instructions**
+* **Developer Usage Notes**
+* **Contact Information or Ownership**
+
+### **Recommended README Structure**
+
+````markdown
+# Smart Monitoring System
+
+## Overview
+A real-time industrial monitoring system that connects to Modbus-enabled devices and displays live data in a web interface using Socket.IO.
+
+## Architecture Summary
+- Python backend for Modbus and Socket.IO
+- JavaScript frontend for real-time UI updates
+- HTML/CSS for layout and presentation
+
+## Business Value
+- Improves operational awareness
+- Reduces downtime via live data insight
+- Enables remote monitoring of facility metrics
+
+## Technology Stack
+- Python 3.x
+- pymodbus
+- Flask + Flask-SocketIO
+- HTML/CSS/JavaScript
+
+## Installation
 ```bash
 pip install -r requirements.txt
 python server.py
@@ -133,22 +234,58 @@ python server.py
 
 ## Contact
 
-For technical documentation ownership, issue reporting, or implementation questions, contact:
+Owned by: Industrial Engineering Team
+Email: [iot.support@company.com](mailto:iot.support@company.com)
 
-**\[Team or Person Name]**
-**\[Role or Department]**
-**\[Email address or internal ticketing link]**
+````
 
+---
+
+## **7. End-to-End Commenting Example**
+
+### **Python + Socket.IO**
+
+```python
+@socketio.on('request_sensor_data')
+def handle_request():
+    """
+    Handles frontend request for temperature data.
+    Emits:
+        'temperature_update': JSON object containing latest temperature.
+    """
+    try:
+        # Read temperature from Modbus register 40001
+        raw = client.read_holding_registers(0, 1).registers[0]
+        temperature = raw / 10.0  # Convert from tenths of a degree
+        emit('temperature_update', {'temp': temperature})
+    except Exception:
+        emit('error', {'message': 'Sensor read failed'})
+````
+
+### **JavaScript Frontend**
+
+```javascript
+// Listen for server update and display it in the UI
+socket.on('temperature_update', (data) => {
+    document.getElementById('temp-display').textContent = `${data.temp} °C`;
+});
+```
+
+### **HTML Structure**
+
+```html
+<!-- Display card for live sensor reading -->
+<div class="sensor-widget">
+    <h3>Temperature</h3>
+    <p id="temp-display">--</p>
+</div>
 ```
 
 ---
 
-## 5. Summary for Stakeholders
+## **8. Summary**
 
-- Code documentation is aligned with industry best practices  
-- Comments explain both function and intent, enabling smooth transitions  
-- The system is modular, maintainable, and ready for scaling  
-- A well-structured README supports both technical and executive understanding  
-
----
-```
+* Well-commented and documented code improves reliability, onboarding, and maintainability
+* Clear documentation protects the business by reducing reliance on key individuals
+* It enables stronger technical operations and greater investor confidence
+* Documentation is not optional—it is a **core asset of your product**
