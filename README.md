@@ -240,6 +240,7 @@ Email: [iot.support@company.com](mailto:iot.support@company.com)
 ````
 ### **Python + Socket.IO**
 
+---
 
 ```python
 @socketio.on('request_sensor_data')
@@ -260,6 +261,7 @@ def handle_request():
 
 ### **JavaScript Frontend**
 
+---
 ```javascript
 // Listen for server update and display it in the UI
 socket.on('temperature_update', (data) => {
@@ -269,6 +271,7 @@ socket.on('temperature_update', (data) => {
 
 ### **HTML Structure**
 
+---
 ```html
 <!-- Display card for live sensor reading -->
 <div class="sensor-widget">
