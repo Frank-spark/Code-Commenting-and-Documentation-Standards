@@ -261,13 +261,5 @@ socket.on('temperature_update', (data) => {
 
 ---
 
-## 9. Contact
 
-For questions about this standard or documentation support, contact:
-
-**Engineering Lead**
-**Industrial IoT Team**
-**[iot.support@company.com](mailto:iot.support@company.com)**
-
-```
 ```
