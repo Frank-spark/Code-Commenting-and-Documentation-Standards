@@ -1,4 +1,4 @@
-````markdown
+
 # Code Commenting and Documentation Standards
 
 ## Table of Contents
