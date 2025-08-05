@@ -241,7 +241,7 @@ Email: [iot.support@company.com](mailto:iot.support@company.com)
 
 ---
 
-## **7. End-to-End Commenting Example**
+**7. End-to-End Commenting Example**
 
 ### **Python + Socket.IO**
 
