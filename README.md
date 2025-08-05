@@ -244,6 +244,7 @@ Email: [iot.support@company.com](mailto:iot.support@company.com)
 
 ### **Python + Socket.IO**
 
+
 ```python
 @socketio.on('request_sensor_data')
 def handle_request():
