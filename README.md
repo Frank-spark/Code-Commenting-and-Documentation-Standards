@@ -1,100 +1,117 @@
 
 # Code Commenting and Documentation Standards
 
-## Table of Contents
+## Purpose
 
-1. [Purpose](#1-purpose)  
-2. [Technical and Business Context](#2-technical-and-business-context)  
-3. [General Commenting Guidelines](#3-general-commenting-guidelines)  
-4. [Language-Specific Standards](#4-language-specific-standards)  
-   - [Python](#python)  
-   - [JavaScript](#javascript)  
-   - [HTML](#html)  
-   - [Modbus](#modbus)  
-   - [Socket.IO](#socketio)  
-5. [Documentation Standards](#5-documentation-standards)  
-6. [End-to-End Commenting Example](#6-end-to-end-commenting-example)  
-7. [Linting and Style Enforcement](#7-linting-and-style-enforcement)  
-8. [Testing and Documentation](#8-testing-and-documentation)  
-9. [Summary](#9-summary)  
-10. [Contact](#10-contact)  
-11. [License](#11-license)
+This document defines a comprehensive and language-agnostic standard for commenting and documenting code across all environments used within the company.
+
+Whether your team is building real-time APIs, hardware-integrated firmware, mobile applications, internal data tooling, or analytics dashboards, the expectation is the same:
+
+- **All code must be documented**
+- **All logic must be explained**
+- **All repositories must include clear and complete README files**
+
+This document serves multiple purposes:
+
+- To guide developers in best practices that improve clarity and maintainability
+- To set expectations for technical leadership and review processes
+- To help executives understand how code quality translates to risk reduction and organizational strength
+- To ensure codebases can be confidently evaluated by investors, acquirers, and audit teams
 
 ---
 
-## 1. Purpose
+## Why Documentation Matters
 
-This document defines the standards for commenting and documenting code across systems using Python, JavaScript, HTML, Modbus, and Socket.IO. It aims to ensure the codebase is understandable, maintainable, and scalable by any engineer, regardless of original authorship.
+Code is a strategic asset. When that asset is undocumented or inconsistently documented, it becomes a liability.
+
+Lack of code documentation leads to:
+
+- Lost knowledge when engineers leave
+- Slowed onboarding and team velocity
+- Fragile systems that only one person understands
+- Technical debt that cannot be tracked or prioritized
+- Failed audits or delayed funding rounds
+- Higher long-term cost of ownership
+
+Well-documented code, by contrast, enables:
+
+- Seamless transitions between engineers
+- Faster diagnosis of production issues
+- Cross-functional collaboration between dev, QA, ops, and business teams
+- Trust and transparency in external reviews
+- Sustainable velocity for fast-scaling companies
 
 ---
 
-## 2. Technical and Business Context
+## Company-Wide Policy
 
-Poorly documented code increases long-term risk. This applies not only to developers but also to stakeholders and investors.
-
-**Technical Benefits**:
-- Faster onboarding
-- Easier debugging and handoffs
-- Increased code longevity
-
-**Business and Operational Benefits**:
-- Reduces reliance on individual experts
-- Avoids critical knowledge silos
-- Supports due diligence in funding or acquisition events
-- Demonstrates engineering maturity and risk mitigation to shareholders
+| Area | Requirement |
+|------|-------------|
+| Code Comments | All non-trivial logic must be explained via inline or block comments |
+| Function Documentation | All public methods, classes, APIs, or components must include formal documentation |
+| README.md | All repositories must include a properly structured `README.md` that communicates the business and technical purpose |
+| Test Clarity | Tests must clearly describe what they are verifying and why |
+| Tooling | Linting, formatting, or CI rules should enforce as many of these standards as possible |
 
 ---
 
-## 3. General Commenting Guidelines
+## General Commenting Guidelines
 
 | Principle | Description |
 |----------|-------------|
-| Clarity over Cleverness | Code and comments should be easy to read |
-| Explain “Why” | Comments should explain context or reasoning |
-| Keep Comments Updated | Remove outdated or misleading comments |
-| Avoid Redundancy | Don’t restate what code obviously does |
-| Use Docstrings | Document all public methods and modules with proper docstrings |
+| Explain the “Why” | Comments should explain intent and context, not just what the code does |
+| Use Natural Language | Write full sentences. Don’t rely on shorthand or cryptic notes |
+| Keep Comments Up to Date | Update or delete comments when the code changes |
+| Avoid Redundant Comments | Don’t restate the code — add value by explaining purpose, edge cases, trade-offs |
+| Standardize Formats | Use docstring conventions or structured headers in supported languages |
 
 ---
 
-## 4. Language-Specific Standards
+## README Expectations
+
+Every repository should contain a `README.md` file with the following sections:
+
+- **Overview** – One paragraph explaining what the system does
+- **Architecture** – Components, data flow, integrations
+- **Business Purpose** – Why this system exists and who it serves
+- **Setup Instructions** – Local install/run/test commands
+- **Environments** – Expected runtime, OS, infrastructure
+- **Contact** – Who owns or supports the codebase
+
+See [Sample README Template](#sample-readme-template) below.
+
+---
+
+## Language-Specific Commenting Examples
 
 ### Python
 
 ```python
-# Connect to Modbus device
-client = ModbusTcpClient('192.168.1.100', port=502)
-
-# Convert from tenths of a degree Celsius
-temperature = raw / 10.0
-````
-
-```python
-def read_temperature():
+def read_temperature(sensor_id: int) -> float:
     """
-    Reads temperature from Modbus register.
+    Reads the temperature in Celsius from a sensor over Modbus.
+
+    Args:
+        sensor_id (int): Sensor register ID
 
     Returns:
-        float: Temperature in Celsius.
-    Raises:
-        ConnectionError: If read fails.
+        float: Temperature in degrees Celsius
     """
-```
+    raw = client.read_holding_registers(sensor_id, 1).registers[0]
+    return raw / 10.0
+````
 
 ---
 
 ### JavaScript
 
-This standard assumes use of vanilla JavaScript. For frameworks like React or Vue, follow respective documentation conventions (e.g., JSDoc, PropTypes, or TypeScript).
-
 ```javascript
-// Connect to the Socket.IO server
-const socket = io();
-
-// Display the latest temperature
-socket.on('temperature_update', (data) => {
-    document.getElementById('temp-display').textContent = `${data.temp} °C`;
-});
+// Fetch temperature from API and update the DOM
+async function updateTemperatureDisplay() {
+    const res = await fetch('/api/temp');
+    const { temp } = await res.json();
+    document.getElementById('temp').textContent = `${temp} °C`;
+}
 ```
 
 ---
@@ -102,179 +119,297 @@ socket.on('temperature_update', (data) => {
 ### HTML
 
 ```html
-<!-- Container for real-time temperature display -->
-<div id="dashboard">
-    <h2>Live Temperature</h2>
-    <p id="temp-display">Waiting for data...</p>
-</div>
+<!-- UI block to display live sensor temperature -->
+<section id="temp-block">
+    <h2>Temperature</h2>
+    <p id="temp">-- °C</p>
+</section>
 ```
 
 ---
 
-### Modbus
+### TypeScript
 
-```python
-# Read register 40001 (temperature in tenths of degrees)
-raw = client.read_holding_registers(0, 1).registers[0]
-temperature = raw / 10.0
+```typescript
+/**
+ * Converts Celsius to Fahrenheit
+ * @param celsius - temperature in Celsius
+ * @returns temperature in Fahrenheit
+ */
+function toFahrenheit(celsius: number): number {
+    return (celsius * 9) / 5 + 32;
+}
 ```
 
 ---
 
-### Socket.IO
+### Rust
 
-```javascript
-// Request data from backend
-socket.emit('request_sensor_data');
-
-// Handle incoming data
-socket.on('temperature_update', (data) => {
-    updateTemperatureDisplay(data.temp);
-});
+```rust
+/// Converts raw sensor data to degrees Celsius
+/// Sensor values are in tenths of a degree
+fn convert(raw: i16) -> f32 {
+    raw as f32 / 10.0
+}
 ```
 
 ---
 
-## 5. Documentation Standards
+### C
 
-Every project should include a properly structured `README.md` with:
+```c
+// Converts ADC value to temperature in Celsius
+float convert_to_celsius(int adc_value) {
+    return (adc_value * 5.0 / 1024.0) * 100.0;
+}
+```
 
-* Project overview
-* Architecture summary
-* Business value
-* Technology stack
-* Setup instructions
-* Contact or ownership details
+---
+
+### C++
+
+```cpp
+/**
+ * Converts raw temperature from sensor
+ * @param raw - raw sensor value
+ * @return float - temperature in Celsius
+ */
+float convertTemperature(int raw) {
+    return (raw * 5.0f / 1024.0f) * 100.0f;
+}
+```
+
+---
+
+### Java
+
+```java
+/**
+ * Converts Celsius to Fahrenheit
+ * @param celsius Temperature in Celsius
+ * @return Temperature in Fahrenheit
+ */
+public double toFahrenheit(double celsius) {
+    return (celsius * 9/5) + 32;
+}
+```
+
+---
+
+### Go
+
+```go
+// Convert Celsius to Fahrenheit
+func ToFahrenheit(celsius float64) float64 {
+    return (celsius * 9 / 5) + 32
+}
+```
+
+---
+
+### Perl
+
+```perl
+# Converts Celsius to Fahrenheit
+sub to_fahrenheit {
+    my $c = shift;
+    return ($c * 9 / 5) + 32;
+}
+```
+
+---
+
+### Pascal
+
+```pascal
+// Convert Celsius to Kelvin
+function CelsiusToKelvin(Celsius: Real): Real;
+begin
+  CelsiusToKelvin := Celsius + 273.15;
+end;
+```
+
+---
+
+### Bash / Shell Script
+
+```bash
+# Restart sensor service and log the result
+sudo systemctl restart sensor.service
+echo "$(date) Sensor service restarted" >> /var/log/sensors.log
+```
+
+---
+
+### SQL
+
+```sql
+-- Select active sensors updated in the last 24 hours
+SELECT * FROM sensors
+WHERE status = 'active'
+AND updated_at >= NOW() - INTERVAL '1 day';
+```
+
+---
+
+### Ruby
+
+```ruby
+# Convert Celsius to Fahrenheit
+def to_fahrenheit(celsius)
+  (celsius * 9 / 5) + 32
+end
+```
+
+---
+
+### Swift
+
+```swift
+/// Converts Celsius temperature to Fahrenheit
+func toFahrenheit(_ celsius: Double) -> Double {
+    return (celsius * 9/5) + 32
+}
+```
+
+---
+
+### Kotlin
+
+```kotlin
+/**
+ * Converts Celsius to Fahrenheit.
+ */
+fun toFahrenheit(celsius: Double): Double {
+    return (celsius * 9 / 5) + 32
+}
+```
+
+---
+
+### MATLAB
+
+```matlab
+% Convert Celsius to Fahrenheit
+function F = toFahrenheit(C)
+    F = (C * 9/5) + 32;
+end
+```
+
+---
+
+### Assembly (x86 NASM)
+
+```asm
+; Multiply value in AX by 2 (simulate doubling temperature)
+MOV AX, [temp_value]
+ADD AX, AX
+```
+
+---
+
+## Sample README Template
 
 <details>
-<summary>Click to view sample README structure</summary>
+<summary>Click to expand</summary>
 
 ```
-# Smart Monitoring System
+# Device Telemetry Service
 
 ## Overview
-A real-time monitoring system using Modbus and Socket.IO.
+Service that collects and forwards telemetry from industrial sensors to a central dashboard.
 
 ## Architecture
-- Python backend (Flask + pymodbus + Socket.IO)
-- JavaScript frontend (vanilla)
-- HTML/CSS interface
+- `collector.py`: connects to devices via Modbus
+- `forwarder.js`: sends JSON data to real-time frontend via WebSocket
+- `dashboard.html`: live interface
+
+## Business Value
+Allows operators to monitor temperature, vibration, and pressure across facilities remotely.
 
 ## Setup
-pip install -r requirements.txt  
-python server.py
+- Clone repository
+- Run `pip install -r requirements.txt`
+- Execute `python collector.py`
+
+## Environment
+- Python 3.11+
+- Linux-based sensor hosts
+- Node.js for frontend service
 
 ## Contact
-Industrial Engineering Team  
-iot.support@company.com
+Owner: Engineering Operations  
+Email: engops@company.com
 ```
 
 </details>
 
 ---
 
-## 6. End-to-End Commenting Example
+## Tooling Recommendations
 
-### Python + Socket.IO
+| Language      | Formatters           | Linters            | Doc Tools            |
+| ------------- | -------------------- | ------------------ | -------------------- |
+| Python        | `black`              | `pylint`, `flake8` | `pydocstyle`, Sphinx |
+| JavaScript/TS | `prettier`           | `eslint`           | JSDoc                |
+| Rust          | `rustfmt`            | `clippy`           | Rustdoc              |
+| C/C++         | `clang-format`       | `cppcheck`         | Doxygen              |
+| Java          | `google-java-format` | `checkstyle`       | Javadoc              |
+| Go            | `gofmt`              | `golint`           | GoDoc                |
+| Shell         | `shfmt`              | `shellcheck`       | Inline comments      |
+| SQL           | Manual               | `sqlfluff`         | Inline comments      |
+| Perl          | `perltidy`           | `Perl::Critic`     | POD                  |
+| Pascal        | Manual               | Manual             | Inline               |
 
-```python
-@socketio.on('request_sensor_data')
-def handle_request():
-    """
-    Handles frontend request for temperature data.
+---
 
-    Emits:
-        'temperature_update': Contains the latest temperature reading.
-    """
-    try:
-        raw = client.read_holding_registers(0, 1).registers[0]
-        temperature = raw / 10.0
-        emit('temperature_update', {'temp': temperature})
-    except Exception:
-        emit('error', {'message': 'Sensor read failed'})
+## Test Documentation
+
+Tests must describe what they cover and why:
+
+```go
+// Ensures overflow condition is handled when input exceeds sensor max range
+func TestSensorOverflow(t *testing.T) {
+    ...
+}
 ```
 
-### JavaScript Frontend
-
-```javascript
-// Listen for server update and display the temperature
-socket.on('temperature_update', (data) => {
-    document.getElementById('temp-display').textContent = `${data.temp} °C`;
+```typescript
+/**
+ * Ensures API returns 400 for invalid temperature format
+ */
+test('rejects bad input', () => {
+  ...
 });
 ```
 
-### HTML Structure
+---
 
-```html
-<!-- Display block for temperature -->
-<div class="sensor-widget">
-    <h3>Temperature</h3>
-    <p id="temp-display">--</p>
-</div>
-```
+## Audit, Transfer, and Continuity Expectations
+
+Code is not complete until it is documented. This applies to internal handoffs and external evaluations.
+
+Every repository must be ready for:
+
+* **Engineer hand-off**: another dev can take over with no downtime
+* **Team transition**: documentation doesn’t rely on tribal knowledge
+* **Executive review**: purpose and risks are clearly stated
+* **Investor diligence**: systems are demonstrably scalable and maintainable
+
+If documentation fails to communicate clearly, the system is not ready for scale or evaluation.
 
 ---
 
-## 7. Linting and Style Enforcement
+## Contact
 
-Use automated tools to enforce consistency and detect errors before they reach production.
-
-**Python**
-
-* `black` – Code formatting
-* `flake8`, `pylint` – Linting and metrics
-* `pydocstyle` – Docstring enforcement
-
-**JavaScript**
-
-* `eslint` – Linting
-* `prettier` – Auto-formatting
-
-**Markdown/Docs**
-
-* `markdownlint` – Linting for `.md` files
-* Recommended: pre-commit hooks and CI checks (e.g., GitHub Actions)
+**Engineering Standards Committee**
+**[engineering.standards@company.com](mailto:engineering.standards@company.com)**
 
 ---
 
-## 8. Testing and Documentation
+## License
 
-Tests should be written and documented clearly. Use inline comments and docstrings to explain purpose, setup, and edge cases.
-
-```python
-def test_temp_within_bounds():
-    """Ensure temperature remains within safe operating limits."""
-    ...
-```
-
-Well-documented tests improve reliability, onboarding, and traceability during debugging or audits.
-
----
-
-## 9. Summary
-
-* Commenting and documentation reduce risk and improve efficiency
-* Standards help avoid knowledge silos and increase transparency
-* Tools and CI enforce consistency automatically
-* Well-documented tests and APIs support scale and handoffs
-* Clarity in code is a long-term investment in product and team success
-
----
-
-## 10. Contact
-
-For questions about this standard or documentation support, contact:
-
-**Engineering Lead**
-**Industrial IoT Team**
-**[iot.support@company.com](mailto:iot.support@company.com)**
-
----
-
-## 11. License
-
-This documentation standard is internal intellectual property of \[Your Company Name]. Redistribution is not permitted without written approval.
+This standard is internal IP of \[Your Company Name]. Do not distribute outside the organization without written authorization.
 
 ```
-
-
+```
